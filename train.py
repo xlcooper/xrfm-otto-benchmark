@@ -4,6 +4,7 @@ from datetime import datetime
 from src.preprocessing import load_data, split_data
 from src.evaluation import get_classification_report, get_f1_score, get_accuracy, get_confusion_matrix, get_auc_roc
 from src.reporting import save_result_json, save_result_md
+from src.feature_analysis import run_permutation_importance
 from config import MODEL_CONFIG
 
 from sklearn.model_selection import GridSearchCV
@@ -68,6 +69,9 @@ def main(model_name):
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     save_result_json(result=result, model_name=model_name, timestamp=timestamp)
     save_result_md(result=result, model_name=model_name, timestamp=timestamp)
+
+    feature_names = X.columns.tolist()
+    run_permutation_importance(model=best_model, X_val=X_val, y_val=y_val, feature_names=feature_names, model_name=model_name)
 
 if __name__ == "__main__":
     model_name = sys.argv[1]
