@@ -20,26 +20,17 @@ def load_data(data_path="./data/train.csv"):
 def split_data(
         X,
         y,
-        val_size=0.2,
         test_size=0.2,
         random_state=42):
     
-    # keep a 6:2:2 split across train/val/test
-    X_temp, X_test, y_temp, y_test = train_test_split(
+    # keep a 8:2 split across train/val/test
+    X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
         test_size=test_size,
         random_state=random_state,
-        stratify=y
+        stratify=y     # 保持分后数据类别均衡
         )
 
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_temp,
-        y_temp,
-        test_size=val_size/(1-test_size),
-        random_state=random_state,
-        stratify=y_temp
-        )
-
-    return X_train, y_train, X_val, y_val, X_test, y_test
+    return X_train, X_test, y_train, y_test
 
