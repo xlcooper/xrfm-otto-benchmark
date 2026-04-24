@@ -13,7 +13,7 @@ def main(model_name):
     X, y, le = load_data()
 
     # split dataset
-    X_train, X_test, y_train, y_test = split_data(X ,y)
+    X_train, _, y_train, _ = split_data(X ,y)
 
     # choose current model config
     model_config = MODEL_CONFIG[model_name]

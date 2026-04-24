@@ -13,7 +13,7 @@ MODEL_CONFIG = {
     },
     "xgboost": {
         "estimator": XGBClassifier(
-            objective="multi:softprob",     
+            objective="multi:softprob",
             eval_metric="mlogloss",
             random_state=42,
         ),

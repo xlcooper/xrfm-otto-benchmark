@@ -21,8 +21,15 @@ def split_data(
         X,
         y,
         test_size=0.2,
+        n_samples=10000,     # 默认 10000，跑全量时传 n_samples=None
         random_state=42):
     
+    if n_samples and n_samples < len(X):
+        X, _, y, _ = train_test_split(
+            X, y, train_size=n_samples,
+            random_state=random_state, stratify=y
+        )
+
     # keep a 8:2 split across train/val/test
     X_train, X_test, y_train, y_test = train_test_split(
         X,
@@ -33,4 +40,19 @@ def split_data(
         )
 
     return X_train, X_test, y_train, y_test
-
+ 
+def split_data_ontrain(
+        X_train,
+        y_train,
+        test_size=0.25,
+        random_state=42
+        ):
+    
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train,
+        y_train,
+        test_size=test_size,
+        random_state=random_state,
+        stratify=y_train
+    )
+    return X_train, X_val, y_train, y_val

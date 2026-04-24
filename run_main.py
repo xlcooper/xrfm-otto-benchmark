@@ -9,7 +9,7 @@ from pathlib import Path
 
 def main(model_name):
 
-    X, y, le = load_data()
+    X, y, _ = load_data()
     X_train, X_test, y_train, y_test = split_data(X, y)
 
     with open(f"configs/best_{model_name}.json") as f:
