@@ -33,10 +33,10 @@ def get_confusion_matrix(y_true, y_pred):
     return C
 
 def get_auc_roc(y_true, y_prob):
-    auc = roc_auc_score(
-        y_true,
-        y_prob,
-        multi_class='ovr',
-        average='macro'
-    )
-    return auc
+    if y_prob.ndim == 1:
+        return roc_auc_score(y_true, y_prob)
+    elif y_prob.shape[1] == 2:
+        return roc_auc_score(y_true, y_prob[:, 1])
+    else:
+        return roc_auc_score(y_true, y_prob, multi_class='ovr', average='macro')
+    

@@ -5,7 +5,9 @@ from sklearn.model_selection import train_test_split
 def load_data(data_path="./data/train.csv"):
 
     df = pd.read_csv(data_path)
-    df = df.drop(columns=['id'])
+    
+    if 'id' in df.columns:
+        df = df.drop(columns=['id'])
 
     #  encoder targets
     le = LabelEncoder()

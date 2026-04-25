@@ -119,8 +119,8 @@ def plot():
     """读取各模型的 scaling 结果，画对比图"""
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-    markers = {"xgboost": "o-", "xrfm": "s-", "random_forest": "^-"}
-    for name in ["xgboost", "xrfm", "random_forest"]:
+    markers = {"xgboost_multiclass": "o-", "xrfm": "s-", "random_forest_clf": "^-"}
+    for name in ["xgboost_multiclass", "xrfm", "random_forest_clf"]:
         path = f"results/scaling_{name}.json"
         if not Path(path).exists():
             print(f"Warning: {path} not found, skipping")
@@ -152,8 +152,8 @@ if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "plot":
         plot()
-    elif cmd in ("xgboost", "xrfm", "random_forest"):
+    elif cmd in ("xgboost_multiclass", "xrfm", "random_forest_clf", "xgboost_binary"):
         run_model(cmd)
     else:
         print(f"Unknown command: {cmd}")
-        print("Usage: python scaling_test.py [xgboost|xrfm|plot]")
+        print("Usage: python scaling_test.py [xgboost|xrfm|random_forest|plot]")
