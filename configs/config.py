@@ -1,4 +1,5 @@
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 
 
@@ -23,5 +24,12 @@ MODEL_CONFIG = {
             "learning_rate": [0.01, 0.1, 0.3],
         }
     },
-    # new model
+    "random_forest": {
+        "estimator": RandomForestClassifier(random_state=42),
+        "param_grid": {
+            "n_estimators": [100, 300, 500],
+            "max_depth": [10, 20, None],
+            "min_samples_leaf": [1, 2, 4],
+        }
+    },
 }

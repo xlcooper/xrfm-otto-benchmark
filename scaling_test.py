@@ -20,26 +20,27 @@ from sklearn.preprocessing import OneHotEncoder
 from pathlib import Path
 
 
-N_VALUES = [500, 1000, 2000, 5000, 10000, 20000]
+N_VALUES = [1000, 2000, 5000, 10000, 20000]
 RANDOM_STATE = 42
 
 
-def run_xgboost(X_train, y_train, X_test, y_test, best_params):
-    """用已知的 best_params 训练 XGBoost，返回 accuracy 和 training time"""
-    from xgboost import XGBClassifier
+def run_others(model_name, X_train, y_train, X_test, y_test):
+    """用已有的 best_params 训练模型，返回 accuracy 和 training time"""
+    from configs.config import MODEL_CONFIG
 
-    model = XGBClassifier(
-        objective="multi:softprob",
-        eval_metric="mlogloss",
-        random_state=RANDOM_STATE,
-    )
-    model.set_params(**best_params)
+    # 读取已有的 best_params（不重新调参）
+    with open(f"configs/best_{model_name}.json") as f:
+        best_params = json.load(f)["best_params"]
+
+    model_config = MODEL_CONFIG[model_name]
+    estimator = model_config["estimator"]
+    estimator.set_params(**best_params)
 
     start = time.perf_counter()
-    model.fit(X_train, y_train)
+    estimator.fit(X_train, y_train)
     train_time = time.perf_counter() - start
 
-    y_pred = model.predict(X_test)
+    y_pred = estimator.predict(X_test)
     accuracy = get_accuracy(y_test, y_pred)
 
     return accuracy, train_time
@@ -82,12 +83,6 @@ def run_model(model_name):
     """对指定模型跑所有 n 值，保存结果到 JSON"""
     X, y, le = load_data()
 
-    # XGBoost 需要读 best_params
-    xgb_best_params = None
-    if model_name == "xgboost":
-        with open("configs/best_xgboost.json") as f:
-            xgb_best_params = json.load(f)["best_params"]
-
     results = {"n_values": N_VALUES, "accuracy": [], "train_time": []}
 
     for n in N_VALUES:
@@ -95,15 +90,17 @@ def run_model(model_name):
         print(f"{model_name} | n = {n}")
         print(f"{'='*50}")
 
-        X_train, X_test, y_train, y_test = split_data(X, y, n_samples=n)
+        if model_name != "xrfm":
+            X_train, X_test, y_train, y_test = split_data(X, y, n_samples=n)
 
-        # 转 numpy
-        X_train_np, X_test_np = X_train.values, X_test.values
-        y_train_np, y_test_np = y_train.values, y_test.values
+            acc, t = run_others(model_name, X_train, y_train, X_test, y_test)
+        else:
+            X_train, X_test, y_train, y_test = split_data(X, y, n_samples=n)
 
-        if model_name == "xgboost":
-            acc, t = run_xgboost(X_train_np, y_train_np, X_test_np, y_test_np, xgb_best_params)
-        elif model_name == "xrfm":
+            # 转 numpy
+            X_train_np, X_test_np = X_train.values, X_test.values
+            y_train_np, y_test_np = y_train.values, y_test.values
+
             acc, t = run_xrfm(X_train_np, y_train_np, X_test_np, y_test_np)
 
         results["accuracy"].append(float(acc))
@@ -122,16 +119,16 @@ def plot():
     """读取各模型的 scaling 结果，画对比图"""
     fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-    for name in ["xgboost", "xrfm"]:
+    markers = {"xgboost": "o-", "xrfm": "s-", "random_forest": "^-"}
+    for name in ["xgboost", "xrfm", "random_forest"]:
         path = f"results/scaling_{name}.json"
         if not Path(path).exists():
             print(f"Warning: {path} not found, skipping")
             continue
         with open(path) as f:
             data = json.load(f)
-        marker = 'o-' if name == "xgboost" else 's-'
-        axes[0].plot(data["n_values"], data["accuracy"], marker, label=name)
-        axes[1].plot(data["n_values"], data["train_time"], marker, label=name)
+        axes[0].plot(data["n_values"], data["accuracy"], markers[name], label=name)
+        axes[1].plot(data["n_values"], data["train_time"], markers[name], label=name)
 
     axes[0].set_xlabel("Number of samples (n)")
     axes[0].set_ylabel("Test Accuracy")
@@ -155,7 +152,7 @@ if __name__ == "__main__":
     cmd = sys.argv[1]
     if cmd == "plot":
         plot()
-    elif cmd in ("xgboost", "xrfm"):
+    elif cmd in ("xgboost", "xrfm", "random_forest"):
         run_model(cmd)
     else:
         print(f"Unknown command: {cmd}")
