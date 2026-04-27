@@ -108,11 +108,11 @@ def run_model(model_name):
         print(f"  Accuracy: {acc:.4f}, Time: {t:.2f}s")
 
     # 保存单个模型的结果
-    Path("results").mkdir(exist_ok=True)
-    with open(f"results/scaling_{model_name}.json", "w") as f:
+    Path("results/scaling").mkdir(parents=True, exist_ok=True)
+    with open(f"results/scaling/scaling_{model_name}.json", "w") as f:
         json.dump(results, f, indent=4)
 
-    print(f"\nDone! Saved to results/scaling_{model_name}.json")
+    print(f"\nDone! Saved to results/scaling/scaling_{model_name}.json")
 
 
 def plot():
@@ -121,7 +121,7 @@ def plot():
 
     markers = {"xgboost_multiclass": "o-", "xrfm": "s-", "random_forest_clf": "^-"}
     for name in ["xgboost_multiclass", "xrfm", "random_forest_clf"]:
-        path = f"results/scaling_{name}.json"
+        path = f"results/scaling/scaling_{name}.json"
         if not Path(path).exists():
             print(f"Warning: {path} not found, skipping")
             continue
@@ -143,9 +143,9 @@ def plot():
     axes[1].grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig("results/scaling_test.png", dpi=150)
+    plt.savefig("results/scaling/scaling_test.png", dpi=150)
     plt.close()
-    print("Plot saved to results/scaling_test.png")
+    print("Plot saved to results/scaling/scaling_test.png")
 
 
 if __name__ == "__main__":

@@ -4,3 +4,5 @@ __pycache__/
 results/*.json
 1.py
 2.py
+eda.py
+requirements.txt
