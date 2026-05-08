@@ -2,10 +2,16 @@
 
 基于 [Otto Group Kaggle 数据集](https://www.kaggle.com/c/otto-group-product-classification-challenge) 的多分类任务，对比 **XGBoost**、**Random Forest** 和 **xRFM** 三种模型，重点关注超参数调优、规模扩展行为和特征可解释性。
 
-## 数据集
+## 数据集（Otto Group Benchmark）
 
-- 61,878 条样本，93 个匿名数值特征，9 个产品类别
-- 数据位于 `data/train.csv`
+> **Benchmark（基准/基准测试）**：在机器学习中，benchmark 指用来公平比较不同模型性能的标准数据集和任务。Otto Group 是 Kaggle 上的一个经典多分类 benchmark，社区普遍用它来衡量分类算法的效果。
+
+- **样本量**：61,878 条（训练集）
+- **特征数**：93 个匿名数值特征（无缺失值）
+- **类别数**：9 个产品类别（多分类任务，类别不平衡）
+- **数据特点**：高维特征空间、匿名特征（无业务含义）、类别分布不均
+- **Benchmark 价值**：社区广泛使用，可与其他公开结果横向对比
+- **数据位置**：`data/train.csv`（已加入 `.gitignore`，不上传）
 
 ## 项目结构
 
@@ -101,7 +107,7 @@ python analyze_features.py plot       # 基于已有结果直接绘图
 | 模型 | Accuracy | AUC-ROC | 训练时间 | 关键超参数 |
 |---|---|---|---|---|
 | **XGBoost** | **0.7875** | **0.9633** | 9.61s | `lr=0.1, max_depth=9, n_estimators=500` |
-| **xRFM** | 0.7720 | 0.9551 | 18.27s | 基于 PyTorch，目标变量需 one-hot 编码 |
+| **xRFM** | 0.7720 | 0.9551 | 18.27s | 调用 xRFM 库（底层 PyTorch），需 one-hot 编码 |
 | Random Forest | 0.7685 | 0.9614 | 0.82s | `max_depth=None, min_samples_leaf=1, n_estimators=100` |
 
 > **结论**：XGBoost 在准确率和 AUC-ROC 上表现最优；Random Forest 训练速度最快但准确率略低；xRFM 作为基于梯度协方差的新方法，表现介于两者之间。
@@ -120,10 +126,13 @@ python analyze_features.py plot       # 基于已有结果直接绘图
 
 ## 特征重要性方法
 
-- **AGOP** — xRFM 梯度协方差对角线（模型专属）
-- **Permutation Importance** — 模型无关，基于 XGBoost 评估
-- **PCA 载荷** — 无监督线性投影
+- **AGOP** — xRFM 梯度协方差对角线（xRFM 模型专属）
+- **Permutation Importance** — 打乱特征值观察性能下降，模型无关
+- **PCA 载荷** — 主成分分析，无监督线性投影
 - **互信息** — 特征与目标之间的统计依赖度
+
+> **为什么选 Otto Group 作为 benchmark？**
+> 这是一个经典的**高维多分类 benchmark**：93 个特征 × 9 个类别，能充分考验模型在高维空间中的分类能力和特征提取能力。社区有大量公开结果可供横向对比。
 
 ## 主要依赖
 
