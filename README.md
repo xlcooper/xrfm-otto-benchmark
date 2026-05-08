@@ -1,22 +1,38 @@
-# Otto Group 产品分类 — ML 模型对比
+# xRFM Reproduction & Comparison
 
-基于 [Otto Group Kaggle 数据集](https://www.kaggle.com/c/otto-group-product-classification-challenge) 的多分类任务，对比 **XGBoost**、**Random Forest** 和 **xRFM** 三种模型，重点关注超参数调优、规模扩展行为和特征可解释性。
+复现论文 **xRFM: Gradient Covariance Feature Importance** 中的特征重要性方法，并与 **XGBoost**、**Random Forest** 等传统算法在表格式数据上进行对比评估。
 
-## 数据集（Otto Group Benchmark）
+## 项目概述
 
-> **Benchmark（基准/基准测试）**：在机器学习中，benchmark 指用来公平比较不同模型性能的标准数据集和任务。Otto Group 是 Kaggle 上的一个经典多分类 benchmark，社区普遍用它来衡量分类算法的效果。
+xRFM 是一种基于梯度协方差的新型特征重要性方法。本项目：
+
+1. **精读并复现** xRFM 论文核心方法（AGOP 梯度协方差特征重要性）
+2. **调用 xRFM 库**（底层 PyTorch）在表格式分类数据上运行
+3. **与经典算法对比**：XGBoost、Random Forest 在相同数据上的性能对比
+4. **超参数调优**：对 XGBoost 和 Random Forest 执行 GridSearchCV
+5. **规模扩展分析**：不同样本量下的准确率与训练时间变化
+6. **特征重要性多方法对比**：AGOP、Permutation Importance、PCA、互信息
+
+## 当前数据集
+
+**Otto Group** — Kaggle 经典多分类数据集
 
 - **样本量**：61,878 条（训练集）
 - **特征数**：93 个匿名数值特征（无缺失值）
-- **类别数**：9 个产品类别（多分类任务，类别不平衡）
-- **数据特点**：高维特征空间、匿名特征（无业务含义）、类别分布不均
-- **Benchmark 价值**：社区广泛使用，可与其他公开结果横向对比
-- **数据位置**：`data/train.csv`（已加入 `.gitignore`，不上传）
+- **类别数**：9 个产品类别（类别不平衡）
+- **数据特点**：高维特征空间、匿名特征、类别分布不均
+
+## Feature Work
+
+- [ ] **扩展更多表格式数据集**：UCI Machine Learning Repository、Kaggle 其他分类数据集（如 Covertype、Santander Customer Transaction 等）
+- [ ] **验证 xRFM 在不同数据规模下的表现**
+- [ ] **对比更多基线模型**：LightGBM、CatBoost、TabNet 等
+- [ ] **特征选择实验**：基于 xRFM AGOP 进行特征选择，观察对模型性能的影响
 
 ## 项目结构
 
 ```
-otto-group-classification-comparison/
+xrfm-otto-benchmark/
 ├── data/
 │   └── train.csv
 ├── src/                    # 核心模块
@@ -57,16 +73,12 @@ pip install -r requirements.txt
 python src/eda.py
 ```
 
-输出数据维度、数据类型、缺失值情况和类别分布。
-
 ### 2. 超参数调优
 
 ```bash
 python tune.py xgboost_multiclass
 python tune.py random_forest_clf
 ```
-
-执行 5 折 GridSearchCV，将最优参数保存至 `configs/best_{model}.json`。
 
 ### 3. 模型评估
 
@@ -76,18 +88,14 @@ python run_main.py random_forest_clf
 python run_xrfm.py
 ```
 
-使用调优后的参数在全量训练集上训练，在测试集上评估，结果保存至 `results/`。
-
 ### 4. 规模扩展实验
 
 ```bash
 python scaling_test.py xgboost_multiclass
 python scaling_test.py random_forest_clf
 python scaling_test.py xrfm
-python scaling_test.py plot          # 汇总结果并可视化
+python scaling_test.py plot
 ```
-
-在 1k、2k、5k、10k、20k 样本量下测试准确率和训练时间。
 
 ### 5. 特征重要性分析
 
@@ -100,9 +108,7 @@ python analyze_features.py mi         # 互信息
 python analyze_features.py plot       # 基于已有结果直接绘图
 ```
 
-生成 2×2 对比图，保存至 `results/feature_analysis/`。
-
-## 模型对比
+## 模型对比（Otto Group 数据集）
 
 | 模型 | Accuracy | AUC-ROC | 训练时间 | 关键超参数 |
 |---|---|---|---|---|
@@ -130,9 +136,6 @@ python analyze_features.py plot       # 基于已有结果直接绘图
 - **Permutation Importance** — 打乱特征值观察性能下降，模型无关
 - **PCA 载荷** — 主成分分析，无监督线性投影
 - **互信息** — 特征与目标之间的统计依赖度
-
-> **为什么选 Otto Group 作为 benchmark？**
-> 这是一个经典的**高维多分类 benchmark**：93 个特征 × 9 个类别，能充分考验模型在高维空间中的分类能力和特征提取能力。社区有大量公开结果可供横向对比。
 
 ## 主要依赖
 
