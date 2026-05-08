@@ -1,8 +1,16 @@
 .venv/
 data/
 __pycache__/
+*.pyc
+.DS_Store
+.vscode/
+.claude/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
 results/*.json
+results/*.png
+results/*.md
 1.py
 2.py
 eda.py
-requirements.txt
