@@ -7,6 +7,6 @@
     },
     "accuracy": 0.8025,
     "auc_roc": 0.9714551303731809,
-    "train_time": 10.951048457995057,
-    "infer_time_per_sample": 1.0560395749052986e-05
+    "train_time": 8.869085166952573,
+    "infer_time_per_sample": 9.822041756706312e-06
 }

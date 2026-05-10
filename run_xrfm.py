@@ -15,6 +15,7 @@ import numpy as np
 
 from src.preprocessing import load_data, split_data, split_data_ontrain
 from src.evaluation import get_accuracy, get_auc_roc
+from src.reporting import plot_main_comparison
 from sklearn.preprocessing import OneHotEncoder
 from xrfm import xRFM
 from pathlib import Path
@@ -82,6 +83,9 @@ def main():
     Path("results").mkdir(exist_ok=True)
     with open("results/run_xrfm.json", "w") as f:
         json.dump(result, f, indent=4)
+
+    # 尝试画对比图（如果三个模型结果都齐了）
+    plot_main_comparison()
 
 
 if __name__ == "__main__":
