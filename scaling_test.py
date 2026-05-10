@@ -90,13 +90,20 @@ def run_model(model_name):
         print(f"{model_name} | n = {n}")
         print(f"{'='*50}")
 
-        if model_name != "xrfm":
-            X_train, X_test, y_train, y_test = split_data(X, y, n_samples=n)
+        # 从 20K 全量数据中子采样 n 条
+        from sklearn.model_selection import train_test_split as sk_split
+        X_sub, _, y_sub, _ = sk_split(
+            X, y, train_size=n, random_state=RANDOM_STATE, stratify=y
+        )
 
+        # 对这 n 条做 80/20 划分
+        X_train, X_test, y_train, y_test = sk_split(
+            X_sub, y_sub, test_size=0.2, random_state=RANDOM_STATE, stratify=y_sub
+        )
+
+        if model_name != "xrfm":
             acc, t = run_others(model_name, X_train, y_train, X_test, y_test)
         else:
-            X_train, X_test, y_train, y_test = split_data(X, y, n_samples=n)
-
             # 转 numpy
             X_train_np, X_test_np = X_train.values, X_test.values
             y_train_np, y_test_np = y_train.values, y_test.values

@@ -23,15 +23,9 @@ def split_data(
         X,
         y,
         test_size=0.2,
-        n_samples=10000,     # 默认 10000，跑全量时传 n_samples=None
         random_state=42):
     
-    if n_samples and n_samples < len(X):
-        X, _, y, _ = train_test_split(
-            X, y, train_size=n_samples,
-            random_state=random_state, stratify=y
-        )
-
+    # 数据已预采样为 20,000 条，直接划分
     # keep a 8:2 split across train/val/test
     X_train, X_test, y_train, y_test = train_test_split(
         X,

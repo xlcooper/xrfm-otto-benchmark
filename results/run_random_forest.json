@@ -1,0 +1,12 @@
+{
+    "model": "random_forest",
+    "best_params": {
+        "max_depth": null,
+        "min_samples_leaf": 1,
+        "n_estimators": 100
+    },
+    "accuracy": 0.7685,
+    "auc_roc": 0.9613961859716107,
+    "train_time": 0.8167177090072073,
+    "infer_time_per_sample": 1.150054149911739e-05
+}

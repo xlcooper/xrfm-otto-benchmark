@@ -1,0 +1,12 @@
+{
+    "model": "xgboost",
+    "best_params": {
+        "learning_rate": 0.1,
+        "max_depth": 9,
+        "n_estimators": 500
+    },
+    "accuracy": 0.7875,
+    "auc_roc": 0.9632940277831169,
+    "train_time": 9.61189674999332,
+    "infer_time_per_sample": 1.2940666492795571e-05
+}

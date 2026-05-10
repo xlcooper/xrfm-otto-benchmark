@@ -17,10 +17,13 @@ xRFM is a novel feature importance method based on gradient covariance. This pro
 
 **Otto Group** — A classic multi-class classification dataset from Kaggle
 
-- **Samples**: 61,878 (training set)
+- **Original size**: 61,878 samples
+- **Used in this project**: 20,000 samples (stratified random subsample, see `src/preprocess_otto.py`)
 - **Features**: 93 anonymous numerical features (no missing values)
 - **Classes**: 9 product categories (class-imbalanced)
 - **Characteristics**: High-dimensional feature space, anonymous features, uneven class distribution
+
+> **Note**: The original 61K dataset is preserved at `data/train_full.csv`. Preprocessing script: `python src/preprocess_otto.py`
 
 ## Feature Work
 
@@ -119,6 +122,8 @@ python analyze_features.py plot       # Plot from existing results
 > **Conclusion**: XGBoost achieves the best accuracy and AUC-ROC; Random Forest is the fastest but slightly less accurate; xRFM, as a new gradient-covariance method, falls in between.
 
 ## Scaling Behavior
+
+> Based on the **Otto Group** dataset (9-class classification, 93 features, 61K samples). We subsample at 1K / 2K / 5K / 10K / 20K to observe scaling trends.
 
 | Sample Size | XGBoost Accuracy | RF Accuracy | xRFM Accuracy |
 |---|---|---|---|

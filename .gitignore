@@ -8,9 +8,10 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .ipynb_checkpoints/
-results/*.json
-results/*.png
-results/*.md
+# results/ files are now tracked (JSON/PNG small enough for GitHub)
+# results/*.json
+# results/*.png
+# results/*.md
 1.py
 2.py
 eda.py
