@@ -231,7 +231,7 @@ def main():
 
     # 汇总
     results = {
-        'dataset': 'Bike Sharing (hour.csv)',
+        'dataset': 'Bike Sharing (day.csv)',
         'task': 'regression (multi-target: [casual, registered])',
         'n_samples': len(y_cnt),
         'n_features': len(feature_names),

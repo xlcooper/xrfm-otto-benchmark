@@ -162,11 +162,11 @@ def run_method(method_name):
         "top_features": top_features,
         "top_values": top_values,
     }
-    Path("results").mkdir(exist_ok=True)
-    with open(f"results/feature_{method_name}.json", "w") as f:
+    Path("results/feature_analysis").mkdir(parents=True, exist_ok=True)
+    with open(f"results/feature_analysis/feature_{method_name}.json", "w") as f:
         json.dump(result, f, indent=4)
 
-    print(f"Saved to results/feature_{method_name}.json")
+    print(f"Saved to results/feature_analysis/feature_{method_name}.json")
 
 
 def plot():
@@ -178,11 +178,16 @@ def plot():
     axes = axes.flatten()
 
     for ax, method, label in zip(axes, methods, labels):
-        path = f"results/feature_{method}.json"
+        path = f"results/feature_analysis/feature_{method}.json"
         if not Path(path).exists():
-            print(f"Warning: {path} not found, skipping")
-            ax.set_title(f"{label} (no data)")
-            continue
+            # 兼容旧路径
+            old_path = f"results/feature_{method}.json"
+            if Path(old_path).exists():
+                path = old_path
+            else:
+                print(f"Warning: {path} not found, skipping")
+                ax.set_title(f"{label} (no data)")
+                continue
 
         with open(path) as f:
             data = json.load(f)
@@ -199,9 +204,10 @@ def plot():
         ax.set_title(label)
 
     plt.tight_layout()
-    plt.savefig("results/feature_comparison.png", dpi=150)
+    Path("results/feature_analysis").mkdir(parents=True, exist_ok=True)
+    plt.savefig("results/feature_analysis/feature_comparison.png", dpi=150)
     plt.close()
-    print("Plot saved to results/feature_comparison.png")
+    print("Plot saved to results/feature_analysis/feature_comparison.png")
 
 
 if __name__ == "__main__":

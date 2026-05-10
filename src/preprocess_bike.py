@@ -1,12 +1,12 @@
 """
 preprocess_bike.py — Bike Sharing 数据预处理
 
-原始数据: data/bike_sharing.csv (hour.csv, 17,379 samples)
+原始数据: data/bike_sharing.csv (day.csv, 731 samples)
 处理后:   特征工程 + One-Hot 编码后的特征矩阵 X 和目标矩阵 y
 
 说明:
-- 使用 UCI Bike Sharing Dataset 的 hour.csv（按小时粒度）
-- 原始 17,379 条样本，不做子采样（数据量适中）
+- 使用 UCI Bike Sharing Dataset 的 day.csv（按日粒度）
+- 原始 731 条样本，不做子采样
 - 目标变量: [casual, registered]（双目标回归，xrfm 0.4.3 需要 >= 2D）
 - 评估变量: cnt = casual + registered
 """
