@@ -111,17 +111,39 @@ python analyze_features.py mi         # Mutual Information
 python analyze_features.py plot       # Plot from existing results
 ```
 
-## Model Comparison (Otto Group Dataset)
+## Results
+
+实验结果分为三个部分：主实验、Scaling 实验、特征分析。
+
+### 1. Main Experiment (Otto Group, 20K samples)
 
 | Model | Accuracy | AUC-ROC | Training Time | Key Hyperparameters |
 |---|---|---|---|---|
-| **XGBoost** | **0.7875** | **0.9633** | 9.61s | `lr=0.1, max_depth=9, n_estimators=500` |
-| **xRFM** | 0.7720 | 0.9551 | 18.27s | Calls xRFM library (PyTorch backend), requires one-hot encoding |
-| Random Forest | 0.7685 | 0.9614 | 0.82s | `max_depth=None, min_samples_leaf=1, n_estimators=100` |
+| **XGBoost** | **0.8025** | **0.9715** | 10.95s | `lr=0.1, max_depth=9, n_estimators=500` |
+| **xRFM** | 0.7965 | 0.9587 | 100.59s | Calls xRFM library (PyTorch backend), requires one-hot encoding |
+| Random Forest | 0.7883 | 0.9655 | 1.39s | `max_depth=None, min_samples_leaf=1, n_estimators=100` |
 
-> **Conclusion**: XGBoost achieves the best accuracy and AUC-ROC; Random Forest is the fastest but slightly less accurate; xRFM, as a new gradient-covariance method, falls in between.
+> **Conclusion**: XGBoost achieves the best accuracy and AUC-ROC; xRFM is competitive on accuracy but training time is significantly higher (~10× XGBoost); Random Forest is the fastest but slightly less accurate.
 
-## Scaling Behavior
+**可视化**: `results/main_experiment_comparison.png`
+
+### 2. Scaling Experiment
+
+> Based on the **Otto Group** dataset (9-class classification, 93 features, 20K samples). We subsample at 1K / 2K / 5K / 10K / 20K to observe scaling trends.
+
+| Sample Size | XGBoost Accuracy | RF Accuracy | xRFM Accuracy |
+|---|---|---|---|
+| 1,000 | 0.665 | 0.670 | **0.705** |
+| 2,000 | 0.705 | 0.718 | **0.713** |
+| 5,000 | 0.751 | 0.736 | 0.740 |
+| 10,000 | **0.788** | 0.769 | 0.772 |
+| 20,000 | **0.799** | 0.773 | 0.786 |
+
+> **Observation**: XGBoost dominates at large data sizes; xRFM performs better on small samples but training time increases sharply (182s at 20k samples).
+
+**结果文件**: `results/scaling/`
+
+### 3. Feature Importance Analysis
 
 > Based on the **Otto Group** dataset (9-class classification, 93 features, 61K samples). We subsample at 1K / 2K / 5K / 10K / 20K to observe scaling trends.
 
