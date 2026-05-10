@@ -3,12 +3,12 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 
-def plot_main_comparison(results_dir="results", save_path="results/main_experiment_comparison.png"):
+def plot_main_comparison(results_dir="results/main", save_path="results/main/main_experiment_comparison.png"):
     """读取三个模型的主实验结果，画对比图"""
     results = {}
     for model in ['xgboost', 'random_forest', 'xrfm']:
         try:
-            with open(f'{results_dir}/run_{model}.json') as f:
+            with open(f'{results_dir}/{model}.json') as f:
                 results[model] = json.load(f)
         except FileNotFoundError:
             return False  # 结果还没齐，跳过

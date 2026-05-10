@@ -43,8 +43,10 @@ def main(model_name):
     "infer_time_per_sample": float(pred_time),
     }
 
-    Path("results").mkdir(exist_ok=True)
-    with open(f"results/run_{model_name}.json", "w") as f:
+    Path("results/main").mkdir(parents=True, exist_ok=True)
+    # 简化文件名: xgboost_multiclass -> xgboost, random_forest_clf -> random_forest
+    short_name = model_name.replace("_multiclass", "").replace("_clf", "")
+    with open(f"results/main/{short_name}.json", "w") as f:
         json.dump(result, f, indent=4)
 
     # 尝试画对比图（如果三个模型结果都齐了）
