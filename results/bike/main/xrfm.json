@@ -1,0 +1,7 @@
+{
+    "rmse": null,
+    "mae": null,
+    "r2": null,
+    "train_time": null,
+    "note": "xRFM 0.4.3 SIGSEGV on Apple Silicon with >2K samples, skipped"
+}
