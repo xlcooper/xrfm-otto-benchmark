@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 def plot_main_comparison(results_dir="results/main", save_path="results/main/main_experiment_comparison.png"):
     """读取三个模型的主实验结果，画对比图"""
     results = {}
-    for model in ['xgboost', 'random_forest', 'xrfm']:
+    for model in ['xgboost_multiclass', 'random_forest_clf', 'xrfm']:
         try:
             with open(f'{results_dir}/{model}.json') as f:
                 results[model] = json.load(f)
@@ -14,7 +14,7 @@ def plot_main_comparison(results_dir="results/main", save_path="results/main/mai
             return False  # 结果还没齐，跳过
 
     models = ['XGBoost', 'Random Forest', 'xRFM']
-    keys = ['xgboost', 'random_forest', 'xrfm']
+    keys = ['xgboost_multiclass', 'random_forest_clf', 'xrfm']
 
     accuracy = [results[k]['accuracy'] for k in keys]
     auc_roc = [results[k]['auc_roc'] for k in keys]

@@ -44,9 +44,7 @@ def main(model_name):
     }
 
     Path("results/main").mkdir(parents=True, exist_ok=True)
-    # 简化文件名: xgboost_multiclass -> xgboost, random_forest_clf -> random_forest
-    short_name = model_name.replace("_multiclass", "").replace("_clf", "")
-    with open(f"results/main/{short_name}.json", "w") as f:
+    with open(f"results/main/{model_name}.json", "w") as f:
         json.dump(result, f, indent=4)
 
     # 尝试画对比图（如果三个模型结果都齐了）
