@@ -125,7 +125,7 @@ python analyze_features.py plot       # Plot from existing results
 
 > **Conclusion**: XGBoost achieves the best accuracy and AUC-ROC; xRFM is competitive on accuracy but training time is significantly higher (~10× XGBoost); Random Forest is the fastest but slightly less accurate.
 
-**可视化**: `results/main_experiment_comparison.png`
+**可视化**: `results/otto_main/main_experiment_comparison.png`
 
 ### 2. Scaling Experiment
 

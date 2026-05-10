@@ -10,7 +10,7 @@ bike_regression.py — Bike Sharing 回归主实验
 目标变量: [casual, registered]（双目标回归，xrfm 0.4.3 要求 >= 2D）
 最终评估用 cnt = casual + registered
 
-结果保存: results/bike/main/
+结果保存: results/bike_main/
 """
 
 import json
@@ -29,7 +29,7 @@ from xrfm import xRFM
 import torch
 
 RANDOM_STATE = 42
-RESULTS_DIR = "results/bike/main"
+RESULTS_DIR = "results/bike_main"
 
 
 def load_bike_data():
@@ -54,7 +54,8 @@ def run_xrfm(X_train, y_train, X_val, y_val, X_test, y_cnt_test):
     model = xRFM(
         device=device,
         tuning_metric='mse',
-        n_tree_iters=3,
+        n_tree_iters=1,
+        n_threads=1,
         random_state=RANDOM_STATE,
     )
 
@@ -65,7 +66,9 @@ def run_xrfm(X_train, y_train, X_val, y_val, X_test, y_cnt_test):
     )
     train_time = time.time() - start
 
-    y_pred = model.predict(torch.tensor(X_test)).numpy()
+    y_pred = model.predict(torch.tensor(X_test))
+    if hasattr(y_pred, 'numpy'):
+        y_pred = y_pred.numpy()
     y_pred_cnt = y_pred[:, 0] + y_pred[:, 1]
 
     metrics = {
@@ -221,14 +224,8 @@ def main():
     X_val = scaler.transform(X_val)
     X_test = scaler.transform(X_test)
 
-    # 跑模型
-    # Note: xRFM 0.4.3 在 Apple Silicon 上大数据量 SIGSEGV，暂时跳过
-    xrfm_metrics = {
-        'rmse': None, 'mae': None, 'r2': None,
-        'train_time': None,
-        'note': 'xRFM 0.4.3 SIGSEGV on Apple Silicon with >2K samples, skipped'
-    }
-    
+    # 跑三个模型
+    xrfm_metrics, _ = run_xrfm(X_train, y_train, X_val, y_val, X_test, y_cnt_test)
     xgb_metrics, _ = run_xgboost(X_train, y_cnt_train, X_test, y_cnt_test)
     rf_metrics, _ = run_random_forest(X_train, y_cnt_train, X_test, y_cnt_test)
 

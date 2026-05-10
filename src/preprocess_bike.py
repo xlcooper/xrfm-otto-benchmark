@@ -34,9 +34,9 @@ def preprocess_bike(input_path="./data/bike_sharing.csv", output_dir="./data"):
     drop_cols = ['instant', 'dteday', 'casual', 'registered', 'cnt']
     X = df.drop(columns=drop_cols)
 
-    # One-Hot 编码类别特征
-    categorical_cols = ['season', 'yr', 'mnth', 'hr', 'holiday', 'weekday',
-                        'workingday', 'weathersit']
+    # One-Hot 编码类别特征（day.csv 没有 hr 列）
+    categorical_cols = [c for c in ['season', 'yr', 'mnth', 'hr', 'holiday', 'weekday',
+                        'workingday', 'weathersit'] if c in X.columns]
     X = pd.get_dummies(X, columns=categorical_cols, drop_first=True)
 
     feature_names = list(X.columns)

@@ -3,7 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 
-def plot_main_comparison(results_dir="results/main", save_path="results/main/main_experiment_comparison.png"):
+def plot_main_comparison(results_dir="results/otto_main", save_path="results/otto_main/main_experiment_comparison.png"):
     """读取三个模型的主实验结果，画对比图"""
     results = {}
     for model in ['xgboost_multiclass', 'random_forest_clf', 'xrfm']:

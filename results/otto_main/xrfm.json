@@ -1,0 +1,7 @@
+{
+    "model": "xrfm",
+    "accuracy": 0.7965,
+    "auc_roc": 0.9587138134159008,
+    "train_time": 99.38089695799863,
+    "infer_time_per_sample": 1.5389218751806767e-05
+}

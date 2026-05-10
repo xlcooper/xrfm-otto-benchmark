@@ -80,8 +80,8 @@ def main():
         "infer_time_per_sample": float(pred_time),
     }
 
-    Path("results/main").mkdir(parents=True, exist_ok=True)
-    with open("results/main/xrfm.json", "w") as f:
+    Path("results/otto_main").mkdir(parents=True, exist_ok=True)
+    with open("results/otto_main/xrfm.json", "w") as f:
         json.dump(result, f, indent=4)
 
     # 尝试画对比图（如果三个模型结果都齐了）
