@@ -111,10 +111,10 @@ def run_method(method_name):
 
     save_dir = Path("results/feature_analysis")
     save_dir.mkdir(parents=True, exist_ok=True)
-    with open(save_dir / f"feature_{method_name}.json", "w") as f:
+    with open(save_dir / f"otto_feature_{method_name}.json", "w") as f:
         json.dump(result, f, indent=4)
 
-    print(f"Saved to results/feature_analysis/feature_{method_name}.json")
+    print(f"Saved to results/feature_analysis/otto_feature_{method_name}.json")
 
 
 def plot():
@@ -125,7 +125,7 @@ def plot():
     fig, axes = plt.subplots(1, 3, figsize=(18, 5))
 
     for ax, method, label in zip(axes, methods, labels):
-        path = f"results/feature_analysis/feature_{method}.json"
+        path = f"results/feature_analysis/otto_feature_{method}.json"
         if not Path(path).exists():
             print(f"Warning: {path} not found, skipping")
             ax.set_title(f"{label} (no data)")
@@ -150,9 +150,9 @@ def plot():
 
     save_dir = Path("results/feature_analysis")
     save_dir.mkdir(parents=True, exist_ok=True)
-    plt.savefig(save_dir / "feature_comparison.png", dpi=150)
+    plt.savefig(save_dir / "otto_feature_comparison.png", dpi=150)
     plt.close()
-    print("Plot saved to results/feature_analysis/feature_comparison.png")
+    print("Plot saved to results/feature_analysis/otto_feature_comparison.png")
 
 
 if __name__ == "__main__":
