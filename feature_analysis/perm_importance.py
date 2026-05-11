@@ -33,7 +33,7 @@ def run():
     print("Running: Permutation Importance")
     print("="*50)
 
-    X, y, le = load_data()
+    X, y, le = load_otto_data()
     X_train, X_test, y_train, y_test = split_data(X, y)
     feature_names = list(X.columns)
 

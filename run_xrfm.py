@@ -24,7 +24,7 @@ from pathlib import Path
 def main():
 
     # ---- 1. 加载数据 & 划分 ----
-    X, y, le = load_data()
+    X, y, le = load_otto_data()
     X_train, X_test, y_train, y_test = split_data(X, y)
 
     # xRFM 需要单独的验证集做内部调参

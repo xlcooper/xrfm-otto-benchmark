@@ -1,7 +1,9 @@
 """
 prepare_bike.py — Bike Sharing 数据准备
 
-特征工程：提取时间特征 + One-Hot 编码
+功能：读取原始 day.csv，做特征工程（提取时间特征 + One-Hot 编码类别变量），
+      保存为 model-ready 的数值矩阵，供训练脚本直接加载。
+
 手动运行一次即可：python src/prepare_bike.py
 """
 
@@ -28,8 +30,11 @@ def engineer_features(input_path="./data/bike_sharing.csv", output_dir="./data")
     X = df.drop(columns=drop_cols)
 
     # One-Hot 编码
-    categorical_cols = [c for c in ['season', 'yr', 'mnth', 'hr', 'holiday', 'weekday',
-                        'workingday', 'weathersit'] if c in X.columns]
+    categorical_cols = []
+    for c in ['season', 'yr', 'mnth', 'hr', 'holiday', 'weekday',
+              'workingday', 'weathersit']:
+        if c in X.columns:
+            categorical_cols.append(c)
     X = pd.get_dummies(X, columns=categorical_cols, drop_first=True)
 
     feature_names = list(X.columns)

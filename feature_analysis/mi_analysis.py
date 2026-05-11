@@ -30,7 +30,7 @@ def run():
     print("Running: Mutual Information")
     print("="*50)
 
-    X, y, le = load_data()
+    X, y, le = load_otto_data()
     X_train, _, y_train, _ = split_data(X, y)
     feature_names = list(X.columns)
 

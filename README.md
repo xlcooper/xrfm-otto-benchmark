@@ -54,7 +54,7 @@ xrfm-otto-benchmark/
 │   └── perm_importance.py  # Permutation Importance boxplot
 ├── results/                # Auto-generated experiment results
 ├── tune.py                 # GridSearchCV hyperparameter tuning
-├── run_main.py             # Evaluate with optimal parameters
+├── run_main_clf.py             # Evaluate with optimal parameters
 ├── run_xrfm.py             # xRFM model evaluation
 ├── scaling_test.py         # Scaling experiments at varying sample sizes
 └── analyze_features.py     # Four-way feature importance comparison
@@ -86,8 +86,8 @@ python tune.py random_forest_clf
 ### 3. Model Evaluation
 
 ```bash
-python run_main.py xgboost_multiclass
-python run_main.py random_forest_clf
+python run_main_clf.py xgboost_multiclass
+python run_main_clf.py random_forest_clf
 python run_xrfm.py
 ```
 

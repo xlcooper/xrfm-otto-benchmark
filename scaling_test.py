@@ -81,7 +81,7 @@ def run_xrfm(X_train, y_train, X_test, y_test):
 
 def run_model(model_name):
     """对指定模型跑所有 n 值，保存结果到 JSON"""
-    X, y, le = load_data()
+    X, y, le = load_otto_data()
 
     results = {"n_values": N_VALUES, "accuracy": [], "train_time": []}
 

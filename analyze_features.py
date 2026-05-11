@@ -109,7 +109,7 @@ def run_mi(X_train, y_train, feature_names):
 
 def run_method(method_name):
     """跑单个方法，保存结果到 JSON"""
-    X, y, le = load_data()
+    X, y, le = load_otto_data()
     X_train, X_test, y_train, y_test = split_data(X, y)
     feature_names = list(X.columns)
 

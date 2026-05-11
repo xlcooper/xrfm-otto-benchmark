@@ -34,7 +34,7 @@ def run_tune(model_name, X_train, y_train):
 
 def main(model_name):
     # load data
-    X, y, _ = load_data()
+    X, y, _ = load_otto_data()
 
     # split dataset
     X_train, _, y_train, _ = split_data(X ,y)
