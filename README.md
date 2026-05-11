@@ -1,174 +1,200 @@
-# xRFM Reproduction & Comparison
+# xRFM Benchmark: Classification & Regression
 
-This project reproduces the feature importance method from the paper **xRFM: Gradient Covariance Feature Importance** and compares it against traditional algorithms (**XGBoost**, **Random Forest**) on tabular classification data.
+Reproduction and comparison of **xRFM** (Gradient Covariance Feature Importance) against classical algorithms (**XGBoost**, **Random Forest**) on tabular data, covering both **classification** and **regression** tasks.
 
 ## Project Overview
 
-xRFM is a novel feature importance method based on gradient covariance. This project:
+1. **Classification benchmark** — Otto Group (20K samples, 9 classes)
+2. **Regression benchmark** — Bike Sharing (731 samples, multi-target)
+3. **Hyperparameter tuning** — GridSearchCV for XGBoost and Random Forest
+4. **Scaling analysis** — Accuracy and training time across sample sizes (Otto only)
+5. **Feature importance comparison** — AGOP, Permutation Importance, PCA, Mutual Information
 
-1. **Reads and reproduces** the core xRFM method (AGOP gradient-covariance feature importance)
-2. **Runs the xRFM library** (PyTorch backend) on tabular classification data
-3. **Compares with classical algorithms**: XGBoost and Random Forest on the same dataset
-4. **Hyperparameter tuning**: GridSearchCV for XGBoost and Random Forest
-5. **Scaling analysis**: Accuracy and training time across different sample sizes
-6. **Feature importance comparison**: AGOP, Permutation Importance, PCA, and Mutual Information
+## Datasets
 
-## Current Dataset
-
-**Otto Group** — A classic multi-class classification dataset from Kaggle
-
+### Otto Group (Classification)
 - **Original size**: 61,878 samples
-- **Used in this project**: 20,000 samples (stratified random subsample, see `src/preprocess_otto.py`)
-- **Features**: 93 anonymous numerical features (no missing values)
-- **Classes**: 9 product categories (class-imbalanced)
-- **Characteristics**: High-dimensional feature space, anonymous features, uneven class distribution
+- **Used**: 20,000 (stratified subsample)
+- **Features**: 93 anonymous numerical features
+- **Classes**: 9 product categories
 
-> **Note**: The original 61K dataset is preserved at `data/train_full.csv`. Preprocessing script: `python src/preprocess_otto.py`
-
-## Feature Work
-
-- [ ] **Extend to more tabular datasets**: UCI ML Repository, other Kaggle classification datasets (e.g., Covertype, Santander Customer Transaction)
-- [ ] **Validate xRFM performance across different data scales**
-- [ ] **Compare with more baselines**: LightGBM, CatBoost, TabNet, etc.
-- [ ] **Feature selection experiments**: Use xRFM AGOP for feature selection and observe impact on model performance
+### Bike Sharing (Regression)
+- **Source**: UCI Bike Sharing (day.csv)
+- **Samples**: 731
+- **Features**: 32 (after One-Hot encoding + time engineering)
+- **Target**: `[casual, registered]` (multi-target, evaluated as `cnt = casual + registered`)
+- **Note**: hour.csv (17,379) cannot be used because xRFM regression triggers **SIGSEGV on Apple Silicon** with >2K samples (see Limitations)
 
 ## Project Structure
 
 ```
 xrfm-otto-benchmark/
 ├── data/
-│   └── train.csv
-├── src/                    # Core modules
-│   ├── preprocessing.py    # Data loading, label encoding, train/val/test split
-│   ├── eda.py              # Exploratory data analysis
-│   ├── evaluation.py       # Accuracy, F1, AUC-ROC, confusion matrix
-│   ├── feature_analysis.py # Permutation Importance
-│   └── reporting.py        # Save results as JSON and Markdown
+│   ├── train.csv              # Otto (20K)
+│   ├── train_full.csv         # Otto (61K original)
+│   ├── bike_X.csv             # Bike features
+│   ├── bike_y.csv             # Bike targets [casual, registered]
+│   └── bike_y_cnt.csv         # Bike cnt reference
+├── src/
+│   ├── preprocessing.py       # Generic load & split
+│   ├── otto_sampler.py        # Otto 61K → 20K sampling
+│   ├── bike_engineer.py       # Bike feature engineering (One-Hot + time)
+│   ├── evaluation.py          # Classification & regression metrics
+│   └── reporting.py           # Plotting ( Otto / Bike comparisons )
 ├── configs/
-│   ├── config.py                       # Model configs and hyperparameter grids
-│   ├── best_xgboost_multiclass.json    # XGBoost optimal params
-│   └── best_random_forest_clf.json     # Random Forest optimal params
-├── feature_analysis/       # Standalone feature importance scripts
-│   ├── mi_analysis.py      # Mutual Information analysis
-│   ├── pca_analysis.py     # PCA scree plot and biplot
-│   └── perm_importance.py  # Permutation Importance boxplot
-├── results/                # Auto-generated experiment results
-├── tune_otto.py                 # GridSearchCV hyperparameter tuning
-├── run_otto_main.py             # Evaluate with optimal parameters
-├── run_otto_xrfm.py             # xRFM model evaluation
-├── scaling_otto.py         # Scaling experiments at varying sample sizes
-└── analyze_otto_features.py     # Four-way feature importance comparison
+│   ├── config.py              # Model configs & param grids
+│   ├── best_xgboost_multiclass.json
+│   ├── best_random_forest_clf.json
+│   ├── best_xgboost_regressor.json
+│   └── best_random_forest_regressor.json
+├── results/
+│   ├── otto_main/             # Otto classification results
+│   ├── bike_main/             # Bike regression results
+│   ├── scaling/               # Otto scaling experiment
+│   └── feature_analysis/      # Feature importance results
+├── tune_otto.py               # Otto hyperparameter tuning
+├── tune_bike.py               # Bike hyperparameter tuning
+├── run_otto_main.py           # Otto XGBoost / RF evaluation
+├── run_otto_xrfm.py           # Otto xRFM evaluation
+├── run_bike_main.py           # Bike XGBoost / RF evaluation
+├── run_bike_xrfm.py           # Bike xRFM evaluation
+├── scaling_otto.py            # Otto scaling experiment
+├── analyze_otto_features.py   # Otto feature analysis (perm / pca / mi)
+├── analyze_bike_features.py   # Bike feature analysis (agop / perm / pca / mi)
+├── plot_bike_heatmap.py       # Bike combined feature importance heatmap
+└── plot_bike_agop_leaf.py     # Bike leaf-level AGOP (single leaf, see Limitations)
 ```
 
-## Environment Setup
+## Environment
 
 ```bash
-conda create -n otto python=3.11
-conda activate otto
-pip install -r requirements.txt
+conda activate ML   # ~/miniconda3/envs/ML
+# Key packages: xrfm==0.4.3, xgboost, scikit-learn, torch, pandas, matplotlib
 ```
 
 ## Usage
 
-### 1. Exploratory Data Analysis
+### Otto (Classification)
 
 ```bash
-python src/eda.py
-```
-
-### 2. Hyperparameter Tuning
-
-```bash
+# 1. Tune
 python tune_otto.py xgboost_multiclass
 python tune_otto.py random_forest_clf
-```
 
-### 3. Model Evaluation
-
-```bash
+# 2. Evaluate
 python run_otto_main.py xgboost_multiclass
 python run_otto_main.py random_forest_clf
 python run_otto_xrfm.py
-```
 
-### 4. Scaling Experiments
-
-```bash
+# 3. Scaling
 python scaling_otto.py xgboost_multiclass
 python scaling_otto.py random_forest_clf
 python scaling_otto.py xrfm
 python scaling_otto.py plot
+
+# 4. Feature analysis
+python analyze_otto_features.py              # all methods + plot
+python analyze_otto_features.py perm         # single method
+python analyze_otto_features.py plot         # plot only
 ```
 
-### 5. Feature Importance Analysis
+### Bike (Regression)
 
 ```bash
-python analyze_otto_features.py            # Run all four methods and plot
-python analyze_otto_features.py agop       # xRFM AGOP
-python analyze_otto_features.py perm       # Permutation Importance (XGBoost)
-python analyze_otto_features.py pca        # PCA component loadings
-python analyze_otto_features.py mi         # Mutual Information
-python analyze_otto_features.py plot       # Plot from existing results
+# 1. Prepare data (run once)
+python src/bike_engineer.py
+
+# 2. Tune
+python tune_bike.py xgboost_regressor
+python tune_bike.py random_forest_regressor
+
+# 3. Evaluate
+python run_bike_main.py xgboost_regressor
+python run_bike_main.py random_forest_regressor
+python run_bike_xrfm.py
+
+# 4. Feature analysis
+python analyze_bike_features.py              # all 4 methods + plot
+python analyze_bike_features.py agop         # single method
+
+# 5. Combined heatmap
+python plot_bike_heatmap.py
 ```
 
 ## Results
 
-实验结果分为三个部分：主实验、Scaling 实验、特征分析。
+### Otto Group — Classification
 
-### 1. Main Experiment (Otto Group, 20K samples)
-
-| Model | Accuracy | AUC-ROC | Training Time | Key Hyperparameters |
-|---|---|---|---|---|
-| **XGBoost** | **0.8025** | **0.9715** | 10.95s | `lr=0.1, max_depth=9, n_estimators=500` |
-| **xRFM** | 0.7965 | 0.9587 | 100.59s | Calls xRFM library (PyTorch backend), requires one-hot encoding |
-| Random Forest | 0.7883 | 0.9655 | 1.39s | `max_depth=None, min_samples_leaf=1, n_estimators=100` |
-
-> **Conclusion**: XGBoost achieves the best accuracy and AUC-ROC; xRFM is competitive on accuracy but training time is significantly higher (~10× XGBoost); Random Forest is the fastest but slightly less accurate.
-
-**可视化**: `results/otto_main/main_experiment_comparison.png`
-
-### 2. Scaling Experiment
-
-> Based on the **Otto Group** dataset (9-class classification, 93 features, 20K samples). We subsample at 1K / 2K / 5K / 10K / 20K to observe scaling trends.
-
-| Sample Size | XGBoost Accuracy | RF Accuracy | xRFM Accuracy |
+| Model | Accuracy | AUC-ROC | Train Time |
 |---|---|---|---|
-| 1,000 | 0.665 | 0.670 | **0.705** |
-| 2,000 | 0.705 | 0.718 | **0.713** |
-| 5,000 | 0.751 | 0.736 | 0.740 |
-| 10,000 | **0.788** | 0.769 | 0.772 |
-| 20,000 | **0.799** | 0.773 | 0.786 |
+| **XGBoost** | **0.8025** | **0.9715** | 10.95s |
+| xRFM | 0.7965 | 0.9587 | 100.59s |
+| Random Forest | 0.7883 | 0.9655 | 1.39s |
 
-> **Observation**: XGBoost dominates at large data sizes; xRFM performs better on small samples but training time increases sharply (182s at 20k samples).
+### Bike Sharing — Regression
 
-**结果文件**: `results/scaling/`
-
-### 3. Feature Importance Analysis
-
-> Based on the **Otto Group** dataset (9-class classification, 93 features, 61K samples). We subsample at 1K / 2K / 5K / 10K / 20K to observe scaling trends.
-
-| Sample Size | XGBoost Accuracy | RF Accuracy | xRFM Accuracy |
+| Model | R² | MSE | MAE |
 |---|---|---|---|
-| 1,000 | 0.665 | 0.670 | **0.705** |
-| 2,000 | 0.705 | 0.718 | **0.713** |
-| 5,000 | 0.751 | 0.736 | 0.740 |
-| 10,000 | **0.788** | 0.769 | 0.772 |
-| 20,000 | **0.799** | 0.773 | 0.786 |
+| **XGBoost** | **0.8922** | 430,993 | 472 |
+| xRFM | 0.8897 | 441,047 | 510 |
+| Random Forest | 0.8703 | 518,894 | 524 |
 
-> **Observation**: XGBoost dominates at large data sizes; xRFM performs better on small samples but training time increases sharply (182s at 20k samples).
+> XGBoost improvement after tuning is significant (+0.030 R²) compared to untuned baseline.
 
-## Feature Importance Methods
+### Scaling (Otto)
 
-- **AGOP** — xRFM gradient-covariance diagonal (xRFM model-specific)
-- **Permutation Importance** — Shuffle feature values and observe performance drop; model-agnostic
-- **PCA Loadings** — Principal Component Analysis, unsupervised linear projection
-- **Mutual Information** — Statistical dependency between feature and target
+| Samples | XGBoost | RF | xRFM |
+|---|---|---|---|
+| 1K | 0.665 | 0.670 | **0.705** |
+| 2K | 0.705 | 0.718 | **0.713** |
+| 5K | **0.751** | 0.736 | 0.740 |
+| 10K | **0.788** | 0.769 | 0.772 |
+| 20K | **0.799** | 0.773 | 0.786 |
 
-## Main Dependencies
+## Feature Importance
 
-- `scikit-learn==1.8.0`
-- `xgboost==3.2.0`
+### Otto — Top 3 Consensus
+| Method | #1 | #2 | #3 |
+|---|---|---|---|
+| Permutation (XGBoost) | feat_34 | feat_11 | feat_60 |
+| PCA | feat_24 | feat_90 | feat_67 |
+| Mutual Information | feat_11 | feat_14 | feat_25 |
+
+### Bike — Top 3 Consensus
+| Method | #1 | #2 | #3 |
+|---|---|---|---|
+| AGOP (xRFM) | temp | atemp | hum |
+| Permutation (XGBoost) | yr_1 | temp | hum |
+| PCA | month | season_4 | season_2 |
+| Mutual Information | atemp | temp | month |
+
+**Combined heatmap**: `results/feature_analysis/bike_feature_heatmap.png`
+
+## Limitations & Further Work
+
+1. **xRFM regression crashes on large datasets (>2K samples) on Apple Silicon**
+   - `hour.csv` (17,379 samples) triggers **SIGSEGV** during xRFM regression fit
+   - Root cause: likely MPS backend memory issue in xRFM 0.4.3 regression branch
+   - **Workaround**: Use `day.csv` (731 samples) with `n_tree_iters=1, n_threads=1`
+   - **Future**: Test on Linux CUDA or wait for upstream fix
+
+2. **Leaf-level AGOP analysis not meaningful on Bike**
+   - xRFM regression on 731 samples produces **only 1 leaf** (tree cannot split)
+   - `plot_bike_agop_leaf.py` exists but output is trivial
+   - **Future**: Run on larger regression dataset (e.g., hour.csv on cloud GPU, or a different benchmark) to get multi-leaf AGOP comparison
+
+3. **Hyperparameter search space**
+   - Current grids are coarse (3×3×3 = 27 combos)
+   - **Future**: Bayesian optimization (Optuna) for fine-grained search
+
+4. **More datasets**
+   - Only 2 datasets (1 classification, 1 small regression)
+   - **Future**: Covertype, California Housing, Santander, etc.
+
+## Dependencies
+
+- `scikit-learn>=1.8.0`
+- `xgboost>=2.1.0`
 - `xrfm==0.4.3`
-- `torch==2.11.0`
-- `pandas==3.0.2`, `numpy==2.4.4`
-- `matplotlib==3.10.8`
+- `torch>=2.0.0`
+- `pandas`, `numpy`, `matplotlib`
