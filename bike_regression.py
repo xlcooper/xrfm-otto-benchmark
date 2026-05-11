@@ -6,7 +6,7 @@ bike_regression.py — Bike Sharing 回归主实验
   2. XGBoost Regressor
   3. Random Forest Regressor
 
-数据集: data/bike_X.csv, data/bike_y.csv (由 src/bike_preprocessing.py 生成)
+数据集: data/bike_X.csv, data/bike_y.csv (由 src/prepare_bike.py 生成)
 目标变量: [casual, registered]（双目标回归，xrfm 0.4.3 要求 >= 2D）
 最终评估用 cnt = casual + registered
 
@@ -26,7 +26,7 @@ from sklearn.ensemble import RandomForestRegressor
 from xrfm import xRFM
 import torch
 
-from src.bike_preprocessing import load_data, split_data
+from src.preprocessing import load_bike_data, split_data
 
 RANDOM_STATE = 42
 RESULTS_DIR = "results/bike_main"
@@ -187,12 +187,24 @@ def main():
     print("Bike Sharing Regression Experiment")
     print("="*50)
 
-    X, y, y_cnt, feature_names = load_data()
+    X, y, y_cnt, feature_names = load_bike_data()
     print(f"Data: X={X.shape}, y={y.shape}, features={len(feature_names)}")
 
     # 划分：60% train / 20% val / 20% test
-    X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y)
-    _, _, _, y_cnt_train, y_cnt_val, y_cnt_test = split_data(X, y_cnt)
+    from src.preprocessing import split_data_ontrain
+    from sklearn.model_selection import train_test_split
+
+    # step1: 80% train+val / 20% test
+    X_trainval, X_test, y_trainval, y_test = split_data(X, y)
+    y_cnt_trainval, y_cnt_test, _, _ = train_test_split(
+        y_cnt, y_cnt, test_size=0.2, random_state=RANDOM_STATE
+    )
+
+    # step2: 从 train+val 切出 val (25% of 80% = 20%)
+    X_train, X_val, y_train, y_val = split_data_ontrain(X_trainval, y_trainval)
+    y_cnt_train, y_cnt_val, _, _ = train_test_split(
+        y_cnt_trainval, y_cnt_trainval, test_size=0.25, random_state=RANDOM_STATE
+    )
 
     print(f"Train: {len(y_train)}, Val: {len(y_val)}, Test: {len(y_test)}")
 

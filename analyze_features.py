@@ -20,7 +20,7 @@ import sys, json
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.preprocessing import load_data, split_data, split_data_ontrain
+from src.preprocessing import load_otto_data, split_data, split_data_ontrain
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import mutual_info_classif

@@ -14,7 +14,7 @@ import sys, json, time
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.preprocessing import load_data, split_data
+from src.preprocessing import load_otto_data, split_data
 from src.evaluation import get_accuracy
 from sklearn.preprocessing import OneHotEncoder
 from pathlib import Path

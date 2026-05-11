@@ -13,7 +13,7 @@ xRFM 与 sklearn 模型的区别：
 import json, time
 import numpy as np
 
-from src.preprocessing import load_data, split_data, split_data_ontrain
+from src.preprocessing import load_otto_data, split_data, split_data_ontrain
 from src.evaluation import get_accuracy, get_auc_roc
 from src.reporting import plot_main_comparison
 from sklearn.preprocessing import OneHotEncoder

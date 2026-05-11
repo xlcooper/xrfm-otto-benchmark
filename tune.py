@@ -1,6 +1,6 @@
 import sys, json
 
-from src.preprocessing import load_data, split_data
+from src.preprocessing import load_otto_data, split_data
 from configs.config import MODEL_CONFIG
 
 from pathlib import Path

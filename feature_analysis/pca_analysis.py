@@ -17,7 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.preprocessing import load_data, split_data
+from src.preprocessing import load_otto_data, split_data
 from sklearn.decomposition import PCA
 
 

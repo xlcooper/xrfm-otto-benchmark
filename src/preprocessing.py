@@ -1,11 +1,8 @@
 """
-preprocessing.py — Otto Group 数据预处理
+preprocessing.py — 通用训练接口
 
-包含：
-  1. sample_data() — 从原始 61K 采样到 20K（手动运行一次）
-  2. load_data() — 加载已采样数据 + LabelEncoder
-  3. split_data() — 划分 train/test
-  4. split_data_ontrain() — 从 train 切出 val
+所有数据集共用的加载和划分函数。
+数据准备（采样/特征工程）请先用 prepare_xxx.py 处理。
 """
 
 from sklearn.preprocessing import LabelEncoder
@@ -15,24 +12,10 @@ from sklearn.model_selection import train_test_split
 RANDOM_STATE = 42
 
 
-def sample_data(input_path="./data/train_full.csv", output_path="./data/train.csv", n_keep=20000):
-    """从原始 61K 数据中采样 20K，保存到 train.csv（手动运行一次）"""
-    df = pd.read_csv(input_path)
-    original_size = len(df)
-    print(f"Original dataset: {original_size:,} samples")
+# ====== Otto Group ======
 
-    if n_keep and n_keep < original_size:
-        y = df['target']
-        df, _ = train_test_split(df, train_size=n_keep, random_state=RANDOM_STATE, stratify=y)
-        df = df.sort_index().reset_index(drop=True)
-
-    df.to_csv(output_path, index=False)
-    print(f"Preprocessed dataset: {len(df):,} samples (saved to {output_path})")
-    return df
-
-
-def load_data(data_path="./data/train.csv"):
-    """加载已采样的数据，做 LabelEncoder"""
+def load_otto_data(data_path="./data/train.csv"):
+    """加载 Otto 数据 + LabelEncoder"""
     df = pd.read_csv(data_path)
     if 'id' in df.columns:
         df = df.drop(columns=['id'])
@@ -42,14 +25,29 @@ def load_data(data_path="./data/train.csv"):
 
     X = df.drop(columns='target')
     y = df['target']
-
     return X, y, le
 
+
+# ====== Bike Sharing ======
+
+def load_bike_data():
+    """加载 Bike Sharing 数据"""
+    X = pd.read_csv("data/bike_X.csv").values.astype('float32')
+    y = pd.read_csv("data/bike_y.csv").values.astype('float32')
+    y_cnt = pd.read_csv("data/bike_y_cnt.csv").values.astype('float32').ravel()
+
+    with open("data/bike_feature_names.txt") as f:
+        feature_names = [line.strip() for line in f]
+
+    return X, y, y_cnt, feature_names
+
+
+# ====== 通用划分（所有数据集共用）======
 
 def split_data(X, y, test_size=0.2, random_state=42):
     """划分 train/test"""
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state, stratify=y
+        X, y, test_size=test_size, random_state=random_state
     )
     return X_train, X_test, y_train, y_test
 
@@ -57,6 +55,6 @@ def split_data(X, y, test_size=0.2, random_state=42):
 def split_data_ontrain(X_train, y_train, test_size=0.25, random_state=42):
     """从 train 中切出 val"""
     X_train, X_val, y_train, y_val = train_test_split(
-        X_train, y_train, test_size=test_size, random_state=random_state, stratify=y_train
+        X_train, y_train, test_size=test_size, random_state=random_state
     )
     return X_train, X_val, y_train, y_val

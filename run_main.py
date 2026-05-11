@@ -1,6 +1,6 @@
 import sys, json, time
 
-from src.preprocessing import load_data, split_data
+from src.preprocessing import load_otto_data, split_data
 from src.evaluation import get_accuracy, get_auc_roc
 from src.reporting import save_result_json, plot_main_comparison
 from configs.config import MODEL_CONFIG
