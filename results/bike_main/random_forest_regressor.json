@@ -1,0 +1,13 @@
+{
+    "model": "random_forest_regressor",
+    "best_params": {
+        "max_depth": 20,
+        "min_samples_leaf": 1,
+        "n_estimators": 100
+    },
+    "r2": 0.8702675513019608,
+    "mse": 518893.856040136,
+    "mae": 524.3456462585034,
+    "train_time": 0.10258179099764675,
+    "infer_time_per_sample": 2.4255387703603018e-05
+}

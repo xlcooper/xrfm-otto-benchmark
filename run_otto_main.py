@@ -2,7 +2,7 @@ import sys, json, time
 
 from src.preprocessing import load_otto_data, split_data
 from src.evaluation import get_accuracy, get_auc_roc
-from src.reporting import save_result_json, plot_main_comparison
+from src.reporting import save_result_json, plot_otto_main_comparison
 from configs.config import MODEL_CONFIG
 
 from pathlib import Path
@@ -48,7 +48,7 @@ def main(model_name):
         json.dump(result, f, indent=4)
 
     # 尝试画对比图（如果三个模型结果都齐了）
-    plot_main_comparison()
+    plot_otto_main_comparison()
 
 if __name__ == "__main__":
     model_name = sys.argv[1]

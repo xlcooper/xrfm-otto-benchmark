@@ -53,11 +53,11 @@ xrfm-otto-benchmark/
 │   ├── pca_analysis.py     # PCA scree plot and biplot
 │   └── perm_importance.py  # Permutation Importance boxplot
 ├── results/                # Auto-generated experiment results
-├── tune.py                 # GridSearchCV hyperparameter tuning
-├── run_main_clf.py             # Evaluate with optimal parameters
-├── run_xrfm.py             # xRFM model evaluation
-├── scaling_test.py         # Scaling experiments at varying sample sizes
-└── analyze_features.py     # Four-way feature importance comparison
+├── tune_otto.py                 # GridSearchCV hyperparameter tuning
+├── run_otto_main.py             # Evaluate with optimal parameters
+├── run_otto_xrfm.py             # xRFM model evaluation
+├── scaling_otto.py         # Scaling experiments at varying sample sizes
+└── analyze_otto_features.py     # Four-way feature importance comparison
 ```
 
 ## Environment Setup
@@ -79,36 +79,36 @@ python src/eda.py
 ### 2. Hyperparameter Tuning
 
 ```bash
-python tune.py xgboost_multiclass
-python tune.py random_forest_clf
+python tune_otto.py xgboost_multiclass
+python tune_otto.py random_forest_clf
 ```
 
 ### 3. Model Evaluation
 
 ```bash
-python run_main_clf.py xgboost_multiclass
-python run_main_clf.py random_forest_clf
-python run_xrfm.py
+python run_otto_main.py xgboost_multiclass
+python run_otto_main.py random_forest_clf
+python run_otto_xrfm.py
 ```
 
 ### 4. Scaling Experiments
 
 ```bash
-python scaling_test.py xgboost_multiclass
-python scaling_test.py random_forest_clf
-python scaling_test.py xrfm
-python scaling_test.py plot
+python scaling_otto.py xgboost_multiclass
+python scaling_otto.py random_forest_clf
+python scaling_otto.py xrfm
+python scaling_otto.py plot
 ```
 
 ### 5. Feature Importance Analysis
 
 ```bash
-python analyze_features.py            # Run all four methods and plot
-python analyze_features.py agop       # xRFM AGOP
-python analyze_features.py perm       # Permutation Importance (XGBoost)
-python analyze_features.py pca        # PCA component loadings
-python analyze_features.py mi         # Mutual Information
-python analyze_features.py plot       # Plot from existing results
+python analyze_otto_features.py            # Run all four methods and plot
+python analyze_otto_features.py agop       # xRFM AGOP
+python analyze_otto_features.py perm       # Permutation Importance (XGBoost)
+python analyze_otto_features.py pca        # PCA component loadings
+python analyze_otto_features.py mi         # Mutual Information
+python analyze_otto_features.py plot       # Plot from existing results
 ```
 
 ## Results

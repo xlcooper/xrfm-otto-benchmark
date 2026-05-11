@@ -3,15 +3,15 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 
-def plot_main_comparison(results_dir="results/otto_main", save_path="results/otto_main/main_experiment_comparison.png"):
-    """读取三个模型的主实验结果，画对比图"""
+def plot_otto_main_comparison(results_dir="results/otto_main", save_path="results/otto_main/main_experiment_comparison.png"):
+    """Otto Group 主实验对比图 — 分类指标：Accuracy / AUC-ROC / Train Time"""
     results = {}
     for model in ['xgboost_multiclass', 'random_forest_clf', 'xrfm']:
         try:
             with open(f'{results_dir}/{model}.json') as f:
                 results[model] = json.load(f)
         except FileNotFoundError:
-            return False  # 结果还没齐，跳过
+            return False
 
     models = ['XGBoost', 'Random Forest', 'xRFM']
     keys = ['xgboost_multiclass', 'random_forest_clf', 'xrfm']
@@ -44,6 +44,54 @@ def plot_main_comparison(results_dir="results/otto_main", save_path="results/ott
         axes[2].text(i, v + max(train_time)*0.02, f'{v:.2f}s', ha='center', va='bottom')
 
     plt.suptitle('Otto Group Dataset — Main Experiment Results', fontsize=14, fontweight='bold')
+    plt.tight_layout()
+    Path(results_dir).mkdir(exist_ok=True)
+    plt.savefig(save_path, dpi=150, bbox_inches='tight')
+    print(f"Plot saved: {save_path}")
+    plt.close()
+    return True
+
+
+def plot_bike_main_comparison(results_dir="results/bike_main", save_path="results/bike_main/main_experiment_comparison.png"):
+    """Bike Sharing 主实验对比图 — 回归指标：R² / MSE / MAE"""
+    results = {}
+    for model in ['xgboost_regressor', 'random_forest_regressor', 'xrfm']:
+        try:
+            with open(f'{results_dir}/{model}.json') as f:
+                results[model] = json.load(f)
+        except FileNotFoundError:
+            return False
+
+    models = ['XGBoost', 'Random Forest', 'xRFM']
+    keys = ['xgboost_regressor', 'random_forest_regressor', 'xrfm']
+
+    r2 = [results[k]['r2'] for k in keys]
+    mse = [results[k]['mse'] for k in keys]
+    mae = [results[k]['mae'] for k in keys]
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+    colors = ['#2E86AB', '#A23B72', '#F18F01']
+
+    axes[0].bar(models, r2, color=colors)
+    axes[0].set_ylabel('R² Score')
+    axes[0].set_title('Test R²')
+    axes[0].set_ylim(min(r2) * 0.98, 1.0)
+    for i, v in enumerate(r2):
+        axes[0].text(i, v + 0.005, f'{v:.4f}', ha='center', va='bottom')
+
+    axes[1].bar(models, mse, color=colors)
+    axes[1].set_ylabel('MSE')
+    axes[1].set_title('Mean Squared Error')
+    for i, v in enumerate(mse):
+        axes[1].text(i, v + max(mse)*0.02, f'{v:,.0f}', ha='center', va='bottom')
+
+    axes[2].bar(models, mae, color=colors)
+    axes[2].set_ylabel('MAE')
+    axes[2].set_title('Mean Absolute Error')
+    for i, v in enumerate(mae):
+        axes[2].text(i, v + max(mae)*0.02, f'{v:,.0f}', ha='center', va='bottom')
+
+    plt.suptitle('Bike Sharing Dataset — Main Experiment Results', fontsize=14, fontweight='bold')
     plt.tight_layout()
     Path(results_dir).mkdir(exist_ok=True)
     plt.savefig(save_path, dpi=150, bbox_inches='tight')

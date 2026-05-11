@@ -1,0 +1,13 @@
+{
+    "model": "xgboost_regressor",
+    "best_params": {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "n_estimators": 300
+    },
+    "r2": 0.892244279384613,
+    "mse": 430993.15625,
+    "mae": 472.2196960449219,
+    "train_time": 0.46775987499859184,
+    "infer_time_per_sample": 1.0568312793767371e-05
+}

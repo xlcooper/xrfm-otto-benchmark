@@ -1,4 +1,8 @@
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, f1_score, roc_auc_score
+from sklearn.metrics import (
+    classification_report, accuracy_score, confusion_matrix,
+    f1_score, roc_auc_score,
+    r2_score, mean_squared_error, mean_absolute_error,
+)
 
 def get_classification_report(y_true, y_pred, class_names):
     report = classification_report(
@@ -39,4 +43,15 @@ def get_auc_roc(y_true, y_prob):
         return roc_auc_score(y_true, y_prob[:, 1])
     else:
         return roc_auc_score(y_true, y_prob, multi_class='ovr', average='macro')
-    
+
+
+def get_r2_score(y_true, y_pred):
+    return r2_score(y_true, y_pred)
+
+
+def get_mse(y_true, y_pred):
+    return mean_squared_error(y_true, y_pred)
+
+
+def get_mae(y_true, y_pred):
+    return mean_absolute_error(y_true, y_pred)

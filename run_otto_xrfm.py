@@ -15,7 +15,7 @@ import numpy as np
 
 from src.preprocessing import load_otto_data, split_data, split_data_ontrain
 from src.evaluation import get_accuracy, get_auc_roc
-from src.reporting import plot_main_comparison
+from src.reporting import plot_otto_main_comparison
 from sklearn.preprocessing import OneHotEncoder
 from xrfm import xRFM
 from pathlib import Path
@@ -85,7 +85,7 @@ def main():
         json.dump(result, f, indent=4)
 
     # 尝试画对比图（如果三个模型结果都齐了）
-    plot_main_comparison()
+    plot_otto_main_comparison()
 
 
 if __name__ == "__main__":
