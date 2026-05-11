@@ -6,7 +6,7 @@ bike_regression.py — Bike Sharing 回归主实验
   2. XGBoost Regressor
   3. Random Forest Regressor
 
-数据集: data/bike_X.csv, data/bike_y.csv (由 src/preprocess_bike.py 生成)
+数据集: data/bike_X.csv, data/bike_y.csv (由 src/bike_preprocessing.py 生成)
 目标变量: [casual, registered]（双目标回归，xrfm 0.4.3 要求 >= 2D）
 最终评估用 cnt = casual + registered
 
@@ -16,11 +16,9 @@ bike_regression.py — Bike Sharing 回归主实验
 import json
 import time
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from xgboost import XGBRegressor
@@ -28,20 +26,10 @@ from sklearn.ensemble import RandomForestRegressor
 from xrfm import xRFM
 import torch
 
+from src.bike_preprocessing import load_data, split_data
+
 RANDOM_STATE = 42
 RESULTS_DIR = "results/bike_main"
-
-
-def load_bike_data():
-    """加载预处理后的 Bike Sharing 数据"""
-    X = pd.read_csv("data/bike_X.csv").values.astype(np.float32)
-    y = pd.read_csv("data/bike_y.csv").values.astype(np.float32)
-    y_cnt = pd.read_csv("data/bike_y_cnt.csv").values.astype(np.float32).ravel()
-
-    with open("data/bike_feature_names.txt") as f:
-        feature_names = [line.strip() for line in f]
-
-    return X, y, y_cnt, feature_names
 
 
 def run_xrfm(X_train, y_train, X_val, y_val, X_test, y_cnt_test):
@@ -199,22 +187,12 @@ def main():
     print("Bike Sharing Regression Experiment")
     print("="*50)
 
-    X, y, y_cnt, feature_names = load_bike_data()
+    X, y, y_cnt, feature_names = load_data()
     print(f"Data: X={X.shape}, y={y.shape}, features={len(feature_names)}")
 
     # 划分：60% train / 20% val / 20% test
-    X_trainval, X_test, y_trainval, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=RANDOM_STATE
-    )
-    _, _, y_cnt_trainval, y_cnt_test = train_test_split(
-        X, y_cnt, test_size=0.2, random_state=RANDOM_STATE
-    )
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_trainval, y_trainval, test_size=0.25, random_state=RANDOM_STATE
-    )
-    _, _, y_cnt_train, y_cnt_val = train_test_split(
-        X_trainval, y_cnt_trainval, test_size=0.25, random_state=RANDOM_STATE
-    )
+    X_train, X_val, X_test, y_train, y_val, y_test = split_data(X, y)
+    _, _, _, y_cnt_train, y_cnt_val, y_cnt_test = split_data(X, y_cnt)
 
     print(f"Train: {len(y_train)}, Val: {len(y_val)}, Test: {len(y_test)}")
 

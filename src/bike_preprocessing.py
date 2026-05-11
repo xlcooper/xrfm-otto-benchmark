@@ -1,5 +1,5 @@
 """
-preprocess_bike.py — Bike Sharing 数据预处理
+bike_preprocessing.py — Bike Sharing 数据预处理
 
 原始数据: data/bike_sharing.csv (day.csv, 731 samples)
 处理后:   特征工程 + One-Hot 编码后的特征矩阵 X 和目标矩阵 y
@@ -12,25 +12,28 @@ preprocess_bike.py — Bike Sharing 数据预处理
 """
 
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from pathlib import Path
 
+RANDOM_STATE = 42
 
-def preprocess_bike(input_path="./data/bike_sharing.csv", output_dir="./data"):
-    """读取 Bike Sharing 数据，做特征工程，保存处理后的 X 和 y"""
+
+def engineer_features(input_path="./data/bike_sharing.csv", output_dir="./data"):
+    """特征工程：提取时间特征 + One-Hot，保存处理后的数据（手动运行一次）"""
     df = pd.read_csv(input_path)
 
     print(f"Original dataset: {len(df):,} samples")
 
-    # 特征工程：提取时间特征
+    # 时间特征
     df['hour'] = pd.to_datetime(df['dteday']).dt.hour
     df['month'] = pd.to_datetime(df['dteday']).dt.month
     df['dayofweek'] = pd.to_datetime(df['dteday']).dt.dayofweek
 
-    # 目标变量（双目标回归）
+    # 目标变量
     y = df[['casual', 'registered']]
     y_cnt = df[['cnt']]
 
-    # 特征列（去掉 ID、日期、目标变量）
+    # 特征列
     drop_cols = ['instant', 'dteday', 'casual', 'registered', 'cnt']
     X = df.drop(columns=drop_cols)
 
@@ -49,14 +52,35 @@ def preprocess_bike(input_path="./data/bike_sharing.csv", output_dir="./data"):
     y.to_csv(f"{output_dir}/bike_y.csv", index=False)
     y_cnt.to_csv(f"{output_dir}/bike_y_cnt.csv", index=False)
 
-    # 保存 feature names
     with open(f"{output_dir}/bike_feature_names.txt", "w") as f:
         f.write("\n".join(feature_names))
 
     print(f"Saved to {output_dir}/bike_X.csv, bike_y.csv, bike_y_cnt.csv")
+    return X, y, y_cnt, feature_names
+
+
+def load_data():
+    """加载预处理后的 Bike Sharing 数据"""
+    X = pd.read_csv("data/bike_X.csv").values.astype('float32')
+    y = pd.read_csv("data/bike_y.csv").values.astype('float32')
+    y_cnt = pd.read_csv("data/bike_y_cnt.csv").values.astype('float32').ravel()
+
+    with open("data/bike_feature_names.txt") as f:
+        feature_names = [line.strip() for line in f]
 
     return X, y, y_cnt, feature_names
 
 
+def split_data(X, y, test_size=0.2, random_state=42):
+    """划分 train/val/test（60/20/20）"""
+    X_trainval, X_test, y_trainval, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state
+    )
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_trainval, y_trainval, test_size=0.25, random_state=random_state
+    )
+    return X_train, X_val, X_test, y_train, y_val, y_test
+
+
 if __name__ == "__main__":
-    preprocess_bike()
+    engineer_features()
